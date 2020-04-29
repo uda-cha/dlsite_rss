@@ -5,6 +5,10 @@ require 'open-uri'
 require 'rss'
 require 'pry'
 
+rss_url = ENV['RSS_URL']
+target_url = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'
+latest_data_basename = "voice_latest_works"
+
 def s3_client
   @s3_client ||=
     Aws::S3::Client.new(
@@ -22,9 +26,6 @@ def put_to_s3(key:, body:, content_type: "application/json; charset=utf-8")
     content_type: content_type
   )
 end
-
-rss_url = ENV['RSS_URL']
-target_url = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'
 
 charset = nil
 html = open(target_url) do |f|
@@ -47,7 +48,7 @@ end
 previous_works = JSON.parse(
   s3_client.get_object(
     bucket: ENV['BUCKET'],
-    key: "latest_works.json"
+    key: "#{latest_data_basename}.json"
   ).body.read
 )
 
@@ -71,5 +72,5 @@ rss = RSS::Maker.make('2.0') do |maker|
 end
 
 put_to_s3(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml")
-put_to_s3(key: "latest_works.json", body: latest_works.to_json)
-put_to_s3(key: "latest_works_#{updated_at}.json", body: latest_works.to_json)
+put_to_s3(key: "#{latest_data_basename}.json", body: latest_works.to_json)
+put_to_s3(key: "#{latest_data_basename}_#{updated_at}.json", body: latest_works.to_json)
