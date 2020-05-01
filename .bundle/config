@@ -1,2 +1,4 @@
 ---
 BUNDLE_PATH: ".bundle"
+BUNDLE_FROZEN: "true"
+BUNDLE_WITHOUT: "development:test"

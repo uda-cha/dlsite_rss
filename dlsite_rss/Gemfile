@@ -4,9 +4,7 @@ source "https://rubygems.org"
 
 git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-gem "httparty"
+gem 'aws-sdk-s3'
+gem 'nokogiri'
 
-group :test do
-  gem "test-unit"
-  gem "mocha"
-end
+ruby '~> 2.5.0'

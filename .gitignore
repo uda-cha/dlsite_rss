@@ -1,3 +1,6 @@
+.aws-sam/*
 .env
 .bundle/*
 !.bundle/config
+vendor/*
+!vendor/.gitkeep
