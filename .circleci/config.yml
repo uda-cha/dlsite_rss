@@ -37,7 +37,14 @@ jobs:
       - run:
           name: deploy to AWS Lambda
           command: |
-            pipenv run sam deploy
+            pipenv run sam build --use-container
+            pipenv run sam package --s3-bucket ${SAM_S3_BUCKET}
+            pipenv run sam deploy \
+              --stack-name ${SAM_STACK_NAME} \
+              --s3-bucket ${SAM_S3_BUCKET} \
+              --s3-prefix ${SAM_S3_PREFIX} \
+              --capabilities ${SAM_CAPABILITIES} \
+              --region ${SAM_REGION}
 
 workflows:
   deploy:
