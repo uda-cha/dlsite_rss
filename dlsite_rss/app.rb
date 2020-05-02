@@ -22,13 +22,9 @@ def put_to_s3(key:, body:, content_type: "application/json; charset=utf-8")
   )
 end
 
-def lambda_handler(event: nil, context: nil)
-  rss_url = ENV['RSS_URL']
-  target_url = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'
-  latest_data_basename = "voice_latest_works"
-
+def parse_latest_works(url:, updated_at:)
   charset = nil
-  html = open(target_url) do |f|
+  html = open(url) do |f|
     charset = f.charset
     f.read
   end
@@ -36,7 +32,6 @@ def lambda_handler(event: nil, context: nil)
   doc = Nokogiri::HTML.parse(html, nil, charset).search('.n_worklist_item')
 
   latest_works = {}
-  updated_at = Time.now.strftime("%Y%m%d_%H%M%S")
   doc.each do |work|
     node = work.search('.work_name')
     title = node.css('a').inner_text
@@ -45,6 +40,16 @@ def lambda_handler(event: nil, context: nil)
     latest_works[url] = { title: title, updated_at: updated_at }
   end
 
+  latest_works
+end
+
+def lambda_handler(event: nil, context: nil)
+  rss_url = ENV['RSS_URL']
+  target_url = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'
+  latest_data_basename = "voice_latest_works"
+  updated_at = Time.now.strftime("%Y%m%d_%H%M%S")
+
+  latest_works = parse_latest_works(url: target_url, updated_at: updated_at)
   previous_works = JSON.parse(
     begin
       s3_client.get_object(
