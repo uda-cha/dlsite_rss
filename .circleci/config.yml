@@ -5,19 +5,35 @@ jobs:
     machine: true
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - python-3.6.3
       - run:
           name: install python
           command: pyenv install 3.6.3
+      - save_cache:
+          paths:
+            - .pyenv
+          key: python-3.6.3
+      - restore_cache:
+          keys:
+            - pipenv-202005021614-{{ checksum "Pipfile.lock" }}
+            - pipenv-202005021614
+            - pipenv-
       - run:
           name: install packages
           command: |
             pip install pipenv
-            pipenv install
+            PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
       - run:
           name: check versions
           command: |
             pipenv --version
             pipenv run python --version
+      - save_cache:
+          paths:
+            - .venv
+          key: pipenv-202005021614-{{ checksum "Pipfile.lock" }}
       - run:
           name: deploy to AWS Lambda
           command: |
