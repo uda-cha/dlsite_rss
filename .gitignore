@@ -4,3 +4,4 @@
 !.bundle/config
 vendor/*
 !vendor/.gitkeep
+samconfig.toml

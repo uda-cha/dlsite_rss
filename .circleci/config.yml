@@ -1,0 +1,33 @@
+version: 2.1
+
+jobs:
+  deploy:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: install python
+          command: pyenv install 3.6.3
+      - run:
+          name: install packages
+          command: |
+            pip install pipenv
+            pipenv install
+      - run:
+          name: check versions
+          command: |
+            pipenv --version
+            pipenv run python --version
+      - run:
+          name: deploy to AWS Lambda
+          command: |
+            pipenv run sam deploy
+
+workflows:
+  deploy:
+    jobs:
+      - deploy:
+        filters:
+          branches:
+            only:
+              - master
