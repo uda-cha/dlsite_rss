@@ -7,14 +7,15 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - python-3.6.3
+            - python-3.6.3-202005030027
+            - python-3.6.3-
       - run:
           name: install python
-          command: pyenv install 3.6.3
+          command: pyenv install 3.6.3 --skip-existing
       - save_cache:
           paths:
-            - .pyenv
-          key: python-3.6.3
+            - /opt/circleci/.pyenv/versions/3.6.3
+          key: python-3.6.3-202005030027
       - restore_cache:
           keys:
             - pipenv-202005021614-{{ checksum "Pipfile.lock" }}
