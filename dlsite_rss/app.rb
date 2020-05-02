@@ -13,12 +13,15 @@ def s3_client
     )
 end
 
-def put_to_s3(key:, body:, content_type: "application/json; charset=utf-8")
+def put_to_s3(key:, body:, content_type: "application/json; charset=utf-8", public: false)
+  acl = public ? "public-read" : "private"
+
   s3_client.put_object(
     bucket: ENV['BUCKET'],
     key: key,
     body: body,
-    content_type: content_type
+    content_type: content_type,
+    acl: acl,
   )
 end
 
@@ -96,7 +99,7 @@ def lambda_handler(event: nil, context: nil)
     end
   end
 
-  put_to_s3(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml")
+  put_to_s3(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
   put_to_s3(key: "#{latest_data_basename}.json", body: latest_works.to_json)
   put_to_s3(key: "#{latest_data_basename}_#{current_time}.json", body: latest_works.to_json)
 end
