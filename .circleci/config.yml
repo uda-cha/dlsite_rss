@@ -44,7 +44,8 @@ jobs:
               --s3-bucket ${SAM_S3_BUCKET} \
               --s3-prefix ${SAM_S3_PREFIX} \
               --capabilities ${SAM_CAPABILITIES} \
-              --region ${SAM_REGION}
+              --region ${SAM_REGION} \
+              --no-fail-on-empty-changeset
 
 workflows:
   deploy:
