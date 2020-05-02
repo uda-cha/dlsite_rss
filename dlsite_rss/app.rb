@@ -43,13 +43,19 @@ def parse_latest_works(url:, updated_at:)
   latest_works
 end
 
+def target_url
+  'https://www.dlsite.com/maniax/new/=/work_type_category/voice'
+end
+
+def current_time
+  @current_time ||= Time.now.strftime("%Y%m%d_%H%M%S")
+end
+
 def lambda_handler(event: nil, context: nil)
   rss_url = ENV['RSS_URL']
-  target_url = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'
   latest_data_basename = "voice_latest_works"
-  updated_at = Time.now.strftime("%Y%m%d_%H%M%S")
 
-  latest_works = parse_latest_works(url: target_url, updated_at: updated_at)
+  latest_works = parse_latest_works(url: target_url, updated_at: current_time)
   previous_works = JSON.parse(
     begin
       s3_client.get_object(
@@ -66,7 +72,7 @@ def lambda_handler(event: nil, context: nil)
   rss = RSS::Maker.make('2.0') do |maker|
     maker.channel.language = 'ja'
     maker.channel.author = "uda-cha"
-    maker.channel.updated = updated_at
+    maker.channel.updated = current_time
     maker.channel.link = rss_url
     maker.channel.title = "DLsite RSS Feed(Voice)"
     maker.channel.description = "DLsite RSS Feed(Voice)"
@@ -82,7 +88,7 @@ def lambda_handler(event: nil, context: nil)
 
   put_to_s3(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml")
   put_to_s3(key: "#{latest_data_basename}.json", body: latest_works.to_json)
-  put_to_s3(key: "#{latest_data_basename}_#{updated_at}.json", body: latest_works.to_json)
+  put_to_s3(key: "#{latest_data_basename}_#{current_time}.json", body: latest_works.to_json)
 end
 
 lambda_handler if __FILE__ == $0
