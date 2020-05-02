@@ -43,7 +43,7 @@ def parse_latest_works(url:, updated_at:)
     author = work.search('.author').at_css('a').inner_text
     work_text = work.search('.work_text').inner_text
 
-    latest_works[url] = {
+    latest_works[url.to_sym] = {
       title: title,
       maker: maker,
       author: author,
@@ -68,7 +68,7 @@ def lambda_handler(event: nil, context: nil)
   latest_data_basename = "voice_latest_works"
 
   latest_works = parse_latest_works(url: target_url, updated_at: current_time)
-  previous_works = JSON.parse(
+  previous_works_json =
     begin
       s3_client.get_object(
         bucket: ENV['BUCKET'],
@@ -77,8 +77,7 @@ def lambda_handler(event: nil, context: nil)
     rescue Aws::S3::Errors::NoSuchKey
       "{}"
     end
-  )
-
+  previous_works = JSON.parse(previous_works_json, symbolize_names: true)
   latest_works.merge!(previous_works).take(20)
 
   rss = RSS::Maker.make('2.0') do |maker|
