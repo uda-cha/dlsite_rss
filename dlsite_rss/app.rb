@@ -34,10 +34,19 @@ def parse_latest_works(url:, updated_at:)
   latest_works = {}
   doc.each do |work|
     node = work.search('.work_name')
-    title = node.css('a').inner_text
-    url = node.css('a').attribute('href').value
+    title = node.at_css('a').inner_text
+    url = node.at_css('a').attribute('href').value
+    maker = work.search('.maker_name').at_css('a').inner_text
+    author = work.search('.author').at_css('a').inner_text
+    work_text = work.search('.work_text').inner_text
 
-    latest_works[url] = { title: title, updated_at: updated_at }
+    latest_works[url] = {
+      title: title,
+      maker: maker,
+      author: author,
+      work_text: work_text,
+      updated_at: updated_at,
+    }
   end
 
   latest_works
@@ -81,6 +90,7 @@ def lambda_handler(event: nil, context: nil)
       maker.items.new_item do |item|
         item.link = key
         item.title = val[:title]
+        item.description = "[#{val[:maker]} / #{val[:author]}] #{val[:work_text]}"
         item.updated = val[:updated_at]
       end
     end
