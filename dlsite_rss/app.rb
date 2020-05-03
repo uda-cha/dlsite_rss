@@ -40,7 +40,7 @@ def parse_latest_works(url:, updated_at:)
     title = node.at_css('a').inner_text
     url = node.at_css('a').attribute('href').value
     maker = work.search('.maker_name').at_css('a').inner_text
-    author = work.search('.author').at_css('a').inner_text
+    author = work.search('.author').at_css('a')&.inner_text
     work_text = work.search('.work_text').inner_text
 
     latest_works[url.to_sym] = {
@@ -92,7 +92,7 @@ def lambda_handler(event: nil, context: nil)
       maker.items.new_item do |item|
         item.link = key
         item.title = val[:title]
-        item.description = "[#{val[:maker]} / #{val[:author]}] #{val[:work_text]}"
+        item.description = "[#{val[:maker]}#{" / " + val[:author] if val[:author]}] #{val[:work_text]}"
         item.updated = val[:updated_at]
       end
     end
