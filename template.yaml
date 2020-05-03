@@ -21,7 +21,7 @@ Resources:
         DlsiteRss:
           Type: Schedule
           Properties:
-            Schedule: "cron(10 0,6,12,18 * * ? *)"
+            Schedule: "cron(10 3,9,15,21 * * ? *)"
   LambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
