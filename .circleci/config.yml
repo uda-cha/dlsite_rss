@@ -75,4 +75,4 @@ workflows:
       - prepare
       - execute:
           requires:
-            - test
+            - prepare
