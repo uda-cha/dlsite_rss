@@ -24,7 +24,10 @@ jobs:
       - run:
           name: install packages
           command: |
-            pip install pipenv
+            pyenv local 3.6.3
+            pip3 --version
+            pip3 install --upgrade pip setuptools
+            pip3 install pipenv
             PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
       - run:
           name: check versions
