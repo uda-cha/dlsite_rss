@@ -1,61 +1,81 @@
 version: 2.1
 
+executors:
+  default:
+    docker:
+      - image: circleci/ruby:2.6.2-stretch
+        environment:
+          BUNDLE_PATH: .bundle
+          BUNDLE_JOBS: 4
+
+commands:
+  save_gems:
+    steps:
+      - save_cache:
+          paths:
+            - .bundle
+          key: gems-202007300040-{{ checksum "Gemfile.lock" }}
+
+  restore_gems:
+    steps:
+      - restore_cache:
+          keys:
+            - gems-202007300040-{{ checksum "Gemfile.lock" }}
+            - gems-202007300040-
+            - gems-
+
 jobs:
-  deploy:
-    machine: true
+  prepare:
+    executor: default
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - python-3.6.3-202005030027
-            - python-3.6.3-
+      - restore_gems
       - run:
-          name: install python
-          command: pyenv install 3.6.3 --skip-existing
-      - save_cache:
-          paths:
-            - /opt/circleci/.pyenv/versions/3.6.3
-          key: python-3.6.3-202005030027
-      - restore_cache:
-          keys:
-            - pipenv-202005021614-{{ checksum "Pipfile.lock" }}
-            - pipenv-202005021614
-            - pipenv-
+          name: bundle install
+          command: bundle install
+      - save_gems
+
+  test:
+    executor: default
+    steps:
+      - checkout
+      - restore_gems
       - run:
-          name: install packages
-          command: |
-            pyenv local 3.6.3
-            pip3 --version
-            pip3 install --upgrade pip setuptools
-            pip3 install pipenv
-            PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
+          name: run app.rb in debug mode # TODO: write spec
+          command: bundle exec ruby app.rb
+
+  execute:
+    executor: default
+    steps:
+      - checkout
+      - restore_gems
       - run:
-          name: check versions
-          command: |
-            pipenv --version
-            pipenv run python --version
-      - save_cache:
-          paths:
-            - .venv
-          key: pipenv-202005021614-{{ checksum "Pipfile.lock" }}
+          name: turn off DEBUG_MODE
+          command: export DEBUG_MODE=false
       - run:
-          name: deploy to AWS Lambda
-          command: |
-            pipenv run sam build --use-container
-            pipenv run sam package --s3-bucket ${SAM_S3_BUCKET}
-            pipenv run sam deploy \
-              --stack-name ${SAM_STACK_NAME} \
-              --s3-bucket ${SAM_S3_BUCKET} \
-              --s3-prefix ${SAM_S3_PREFIX} \
-              --capabilities ${SAM_CAPABILITIES} \
-              --region ${SAM_REGION} \
-              --no-fail-on-empty-changeset
+          name: cron job
+          command: bundle exec ruby app.rb
 
 workflows:
-  deploy:
+  ci:
     jobs:
-      - deploy:
-        filters:
-          branches:
-            only:
-              - master
+      - prepare
+      - test:
+          requires:
+            - prepare
+  execute:
+    triggers:
+      - schedule:
+          cron: "10 3,9,15,21 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - prepare
+      - test:
+          requires:
+            - prepare
+      - execute:
+          requires:
+            - test

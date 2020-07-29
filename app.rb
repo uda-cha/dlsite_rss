@@ -83,7 +83,11 @@ def make_rss(data:)
   end
 end
 
-def lambda_handler(event: nil, context: nil, debug_mode: false)
+def debug_mode?
+  ENV.fetch("DEBUG_MODE") { true }
+end
+
+def lambda_handler(event: nil, context: nil)
   latest_data_basename = "voice_latest_works"
 
   latest_works = parse_latest_works(url: target_url, updated_at: current_time)
@@ -100,7 +104,7 @@ def lambda_handler(event: nil, context: nil, debug_mode: false)
   latest_works.merge!(previous_works).take(20)
   rss = make_rss(data: latest_works)
 
-  if debug_mode
+  if debug_mode?
     puts rss.to_s
   else
     put_to_s3(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
@@ -108,4 +112,4 @@ def lambda_handler(event: nil, context: nil, debug_mode: false)
   end
 end
 
-lambda_handler(debug_mode: true) if __FILE__ == $0
+lambda_handler if __FILE__ == $0

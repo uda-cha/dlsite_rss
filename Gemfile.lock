@@ -22,31 +22,22 @@ GEM
     jmespath (1.4.0)
     method_source (1.0.0)
     mini_portile2 (2.4.0)
-    mocha (1.11.2)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
-    power_assert (1.2.0)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
     pry-byebug (3.9.0)
       byebug (~> 11.0)
       pry (~> 0.13.0)
-    test-unit (3.3.5)
-      power_assert
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   aws-sdk-s3
-  mocha
   nokogiri
   pry-byebug
-  test-unit
-
-RUBY VERSION
-   ruby 2.5.1p57
 
 BUNDLED WITH
-   2.0.1
+   1.17.2
