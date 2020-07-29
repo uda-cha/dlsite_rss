@@ -84,7 +84,8 @@ def make_rss(data:)
 end
 
 def debug_mode?
-  ENV.fetch("DEBUG_MODE") { true }
+  mode = ENV.fetch("DEBUG_MODE") { true }
+  mode == "false" ? false : true
 end
 
 def lambda_handler(event: nil, context: nil)

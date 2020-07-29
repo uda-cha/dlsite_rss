@@ -73,9 +73,6 @@ workflows:
                 - master
     jobs:
       - prepare
-      - test:
-          requires:
-            - prepare
       - execute:
           requires:
             - test
