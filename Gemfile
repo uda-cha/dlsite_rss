@@ -10,5 +10,3 @@ gem 'nokogiri'
 group :development, :test do
   gem "pry-byebug"
 end
-
-ruby '~> 2.5.0'
