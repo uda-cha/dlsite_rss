@@ -24,9 +24,9 @@ jobs:
       - run:
           name: install packages
           command: |
-            pip --version
-            pip install --upgrade pip setuptools
-            pip install pipenv
+            pip3 --version
+            pip3 install --upgrade pip setuptools
+            pip3 install pipenv
             PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
       - run:
           name: check versions
