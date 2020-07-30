@@ -105,6 +105,7 @@ def lambda_handler(event: nil, context: nil)
   latest_works.merge!(previous_works).take(20)
   rss = make_rss(data: latest_works)
 
+  puts debug_mode?.class
   if debug_mode?
     puts rss.to_s
   else

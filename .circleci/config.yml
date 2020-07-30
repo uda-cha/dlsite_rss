@@ -50,11 +50,8 @@ jobs:
       - checkout
       - restore_gems
       - run:
-          name: turn off DEBUG_MODE
-          command: export DEBUG_MODE=false
-      - run:
           name: cron job
-          command: bundle exec ruby app.rb
+          command: DEBUG_MODE=false bundle exec ruby app.rb
 
 workflows:
   ci:
