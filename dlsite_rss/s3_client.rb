@@ -1,6 +1,6 @@
 require 'aws-sdk-s3'
 
-module Dlsite
+module DlsiteRss
   class S3Client
     def put(key:, body:, content_type: "application/json; charset=utf-8", public: false)
       acl = public ? "public-read" : "private"

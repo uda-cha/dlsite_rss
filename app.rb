@@ -8,7 +8,7 @@ end
 
 def main
   current_time = Time.now.strftime("%Y%m%d_%H%M%S")
-  s3_client = Dlsite::S3Client.new
+  s3_client = DlsiteRss::S3Client.new
   latest_contents_file = "voice_latest_contents.json"
 
   latest_contents = Dlsite::Voice::Parser.parse(executed_at: current_time)
