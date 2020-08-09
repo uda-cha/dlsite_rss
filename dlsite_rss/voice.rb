@@ -51,9 +51,7 @@ module Dlsite
       end
 
       def each(&block)
-        @contents.each do |c|
-          yield c
-        end
+        @contents.each { |c| yield c }
       end
 
       def merge!(others)
@@ -77,29 +75,18 @@ module Dlsite
       end
     end
 
-    class Content
-      attr_reader :url, :title, :maker, :author, :work_text, :updated_at
-
-      def initialize(url:, title:, maker:, author:, work_text:, updated_at:)
-        @url = url
-        @title = title
-        @maker = maker
-        @author = author
-        @work_text = work_text
-        @updated_at = updated_at
-      end
-
+    class Content < Struct.new(:url, :title, :maker, :author, :work_text, :updated_at, keyword_init: true)
       def description
-        "[#{self.maker}#{" / " + self.author if self.author}] #{self.work_text}"
+        "[#{maker}#{" / " + author if author}] #{work_text}"
       end
     end
 
     module Rss
-      def self.make(contents, current_time)
+      def self.make(contents, executed_at)
         RSS::Maker.make('2.0') do |maker|
           maker.channel.language = 'ja'
           maker.channel.author = "uda-cha"
-          maker.channel.updated = current_time
+          maker.channel.updated = executed_at
           maker.channel.link = ENV['RSS_URL']
           maker.channel.title = "DLsite RSS Feed(Voice)"
           maker.channel.description = "DLsite RSS Feed(Voice)"
