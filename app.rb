@@ -1,29 +1,8 @@
-require 'aws-sdk-s3'
 require 'json'
 require 'nokogiri'
 require 'open-uri'
 require 'rss'
-
-def s3_client
-  @s3_client ||=
-    Aws::S3::Client.new(
-      region: ENV['REGION'],
-      access_key_id: ENV['ACCESS_KEY'],
-      secret_access_key: ENV['SECRET_ACCESS_KEY']
-    )
-end
-
-def put_to_s3(key:, body:, content_type: "application/json; charset=utf-8", public: false)
-  acl = public ? "public-read" : "private"
-
-  s3_client.put_object(
-    bucket: ENV['BUCKET'],
-    key: key,
-    body: body,
-    content_type: content_type,
-    acl: acl,
-  )
-end
+require_relative 'dlsite_rss/s3_client'
 
 def parse_latest_works(url:, updated_at:)
   charset = nil
@@ -89,18 +68,12 @@ def debug_mode?
 end
 
 def lambda_handler(event: nil, context: nil)
+  s3_client = Dlsite::S3Client.new
   latest_data_basename = "voice_latest_works"
 
   latest_works = parse_latest_works(url: target_url, updated_at: current_time)
-  previous_works_json =
-    begin
-      s3_client.get_object(
-        bucket: ENV['BUCKET'],
-        key: "#{latest_data_basename}.json"
-      ).body.read
-    rescue Aws::S3::Errors::NoSuchKey
-      "{}"
-    end
+  previous_works_json = s3_client.get(key: "#{latest_data_basename}.json") || "{}"
+
   previous_works = JSON.parse(previous_works_json, symbolize_names: true)
   latest_works.merge!(previous_works).take(20)
   rss = make_rss(data: latest_works)
@@ -109,8 +82,8 @@ def lambda_handler(event: nil, context: nil)
   if debug_mode?
     puts rss.to_s
   else
-    put_to_s3(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
-    put_to_s3(key: "#{latest_data_basename}.json", body: latest_works.to_json)
+    s3_client.put(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
+    s3_client.put(key: "#{latest_data_basename}.json", body: latest_works.to_json)
   end
 end
 
