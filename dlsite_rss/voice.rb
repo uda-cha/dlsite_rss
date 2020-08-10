@@ -60,6 +60,10 @@ module Dlsite
         self
       end
 
+      def to_json
+        @contents.map(&:to_h).to_json
+      end
+
       def self.load_json(json)
         return nil unless json
         JSON.parse(json).map do |c|
