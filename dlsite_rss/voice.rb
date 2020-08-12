@@ -68,12 +68,12 @@ module Dlsite
         return nil unless json
         JSON.parse(json).map do |c|
           Dlsite::Voice::Content.new(
-            url: c.url,
-            title: c.title,
-            maker: c.maker,
-            author: c.author,
-            work_text: c.work_text,
-            updated_at: c.updated_at,
+            url: c['url'],
+            title: c['title'],
+            maker: c['maker'],
+            author: c['author'],
+            work_text: c['work_text'],
+            updated_at: c['updated_at'],
           )
         end
       end
