@@ -16,14 +16,14 @@ def main
     Dlsite::Voice::Contents.load_json(
       s3_client.get(key: voice_json)
     )
-  latest_contents.merge!(previous_contents).take(20)
-  rss = Dlsite::Voice::Rss.make(latest_contents, current_time)
+  contents = latest_contents.merge(previous_contents).last(20)
+  rss = Dlsite::Voice::Rss.make(contents, current_time)
 
   if debug_mode?
     puts rss.to_s
   else
     s3_client.put(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
-    s3_client.put(key: voice_json, body: latest_contents.to_json)
+    s3_client.put(key: voice_json, body: contents.to_json)
   end
 end
 
