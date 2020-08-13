@@ -37,27 +37,29 @@ module Dlsite
     end
 
     class Contents
-      def initialize
-        @contents = []
+      def initialize(contents: nil)
+        @contents = contents || []
       end
 
       def add(content)
         @contents.push(content) if @contents.all? { |c| c.url != content.url}
       end
 
-      def take(n)
-        return @contents if @contents.length <= n
-        @contents.sort_by { |c| c.url }.sort_by { |c| c.updated_at }.take(n)
+      def last(n)
+        return self if @contents.length <= n
+        contents = @contents.sort_by { |c| c.url }.sort_by { |c| c.updated_at }.last(n)
+        self.class.new(contents: contents)
       end
 
       def each(&block)
         @contents.each { |c| yield c }
       end
 
-      def merge!(others)
+      def merge(others)
         return self unless others
-        others.each { |o| self.add(o) }
-        self
+        c = self.dup
+        others.each { |o| c.add(o) }
+        c
       end
 
       def to_json
