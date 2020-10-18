@@ -9,20 +9,16 @@ module Dlsite
       URL = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'.freeze
 
       def self.parse(executed_at:)
-        charset = nil
-        html = open(URL) do |f|
-          charset = f.charset
-          f.read
-        end
-
+        html, charset = get_html_with_charset(URL)
         doc = Nokogiri::HTML.parse(html, nil, charset).search('.n_worklist_item')
 
         contents = Dlsite::Voice::Contents.new
         doc.each do |work|
           node = work.search('.work_name')
+          url = node.at_css('a').attribute('href').value
           contents.add(
             Dlsite::Voice::Content.new(
-              url: node.at_css('a').attribute('href').value,
+              url: url,
               title: node.at_css('a').inner_text,
               maker: work.search('.maker_name').at_css('a').inner_text,
               author: work.search('.author').at_css('a')&.inner_text,
@@ -34,6 +30,18 @@ module Dlsite
 
         contents
       end
+
+      def self.get_html_with_charset(url)
+        charset = nil
+        html = open(url) do |f|
+          charset = f.charset
+          f.read
+        end
+
+        return html, charset
+      end
+
+      private_class_method :get_html_with_charset
     end
 
     class Contents
