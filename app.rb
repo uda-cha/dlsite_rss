@@ -7,17 +7,16 @@ def debug_mode?
 end
 
 def main
-  current_time = Time.now.strftime("%Y%m%d_%H%M%S")
   s3_client = DlsiteRss::S3Client.new
   voice_json = "voice.json"
 
-  latest_contents = Dlsite::Voice::Parser.parse(executed_at: current_time)
+  latest_contents = Dlsite::Voice::Parser.parse
   previous_contents =
     Dlsite::Voice::Contents.load_json(
       s3_client.get(key: voice_json)
     )
   contents = latest_contents.merge(previous_contents).last(20)
-  rss = Dlsite::Voice::Rss.make(contents, current_time)
+  rss = Dlsite::Voice::Rss.make(contents)
 
   if debug_mode?
     puts rss.to_s
