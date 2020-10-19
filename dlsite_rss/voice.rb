@@ -90,7 +90,7 @@ module Dlsite
             maker: c['maker'],
             author: c['author'],
             work_text: c['work_text'],
-            updated_at: c['updated_at'],
+            updated_at: Time.parse(c['updated_at']),
           )
         end
       end
