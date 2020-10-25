@@ -26,6 +26,7 @@ module Dlsite
               updated_at: parse_updated_at(url),
             )
           )
+          sleep(0.3)
         end
 
         contents
@@ -53,15 +54,16 @@ module Dlsite
 
     class Contents
       def initialize(contents: nil)
+        raise ArgumentError if contents && !contents.all? { |c| c.instance_of?(Content) }
         @contents = contents || []
       end
 
       def add(content)
+        raise ArgumentError unless content.instance_of?(Content)
         @contents.push(content) if @contents.all? { |c| c.url != content.url}
       end
 
       def last(n)
-        return self if @contents.length <= n
         contents = @contents.sort_by { |c| c.url }.sort_by { |c| c.updated_at }.last(n)
         self.class.new(contents: contents)
       end
@@ -82,9 +84,9 @@ module Dlsite
       end
 
       def self.load_json(json)
-        return nil unless json
-        JSON.parse(json).map do |c|
-          Dlsite::Voice::Content.new(
+        return new unless json
+        contents = JSON.parse(json).map do |c|
+          Content.new(
             url: c['url'],
             title: c['title'],
             maker: c['maker'],
@@ -93,6 +95,8 @@ module Dlsite
             updated_at: Time.parse(c['updated_at']),
           )
         end
+
+        new(contents: contents)
       end
     end
 
