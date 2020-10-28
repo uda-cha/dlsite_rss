@@ -58,6 +58,10 @@ module Dlsite
         @contents = contents || []
       end
 
+      def initialize_copy(other)
+        @contents = @contents.dup
+      end
+
       def add(content)
         raise ArgumentError unless content.instance_of?(Content)
         @contents.push(content) if @contents.all? { |c| c.url != content.url}
