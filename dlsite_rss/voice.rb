@@ -34,12 +34,18 @@ module Dlsite
 
       def self.get_html_with_charset(url)
         charset = nil
-        html = open(url) do |f|
+        options = {
+          "accept-encoding" => "gzip, deflate, br"
+          }
+        html = open(url, options) do |f|
           charset = f.charset
           f.read
         end
 
         return html, charset
+      rescue => e
+        puts "url: " + url.to_s
+        raise e
       end
 
       def self.parse_updated_at(url)
