@@ -2,6 +2,7 @@ require 'json'
 require 'nokogiri'
 require 'open-uri'
 require 'rss'
+require 'zlib'
 
 module Dlsite
   module Voice
@@ -35,11 +36,15 @@ module Dlsite
       def self.get_html_with_charset(url)
         charset = nil
         options = {
-          "accept-encoding" => "gzip, deflate, br"
+          "accept-encoding" => "gzip, deflate"
           }
         html = open(url, options) do |f|
           charset = f.charset
-          f.read
+          if f.content_encoding && f.content_encoding.include?('gzip')
+            Zlib::GzipReader.wrap(f).read
+          else
+            f.read
+          end
         end
 
         return html, charset
