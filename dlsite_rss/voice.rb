@@ -6,10 +6,14 @@ require 'zlib'
 
 module Dlsite
   module Voice
-    module Parser
+    class Parser
       URL = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'.freeze
 
       def self.parse
+        self.new.parse
+      end
+
+      def parse
         html, charset = get_html_with_charset(URL)
         doc = Nokogiri::HTML.parse(html, nil, charset).search('.n_worklist_item')
 
@@ -17,7 +21,7 @@ module Dlsite
         doc.each do |work|
           node = work.search('.work_name')
           url = node.at_css('a').attribute('href').value
-          contents.add(
+          contents.push(
             Dlsite::Voice::Content.new(
               url: url,
               title: node.at_css('a').inner_text,
@@ -33,14 +37,15 @@ module Dlsite
         contents
       end
 
-      def self.get_html_with_charset(url)
+      private
+      def get_html_with_charset(url)
         charset = nil
         options = {
-          "accept-encoding" => "gzip, deflate"
+          "accept-encoding" => "gzip"
           }
         html = open(url, options) do |f|
           charset = f.charset
-          if f.content_encoding && f.content_encoding.include?('gzip')
+          if f.content_encoding && f.content_encoding.include?(options["accept-encoding"])
             Zlib::GzipReader.wrap(f).read
           else
             f.read
@@ -53,19 +58,20 @@ module Dlsite
         raise e
       end
 
-      def self.parse_updated_at(url)
+      def parse_updated_at(url)
         html, charset = get_html_with_charset(url)
         doc = Nokogiri::HTML.parse(html, nil, charset)
         updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1]").inner_text + '+09:00'
         Time.strptime(updated_at_txt, '%Y年%m月%d日%t%H時%z')
       end
-
-      private_class_method :get_html_with_charset, :parse_updated_at
     end
 
     class Contents
+      extend Forwardable
+      def_delegators :@contents, :each
+
       def initialize(contents: nil)
-        raise ArgumentError if contents && !contents.all? { |c| c.instance_of?(Content) }
+        raise ArgumentError if contents && !contents.all? { |c| valid_content?(c) }
         @contents = contents || []
       end
 
@@ -73,8 +79,8 @@ module Dlsite
         @contents = @contents.dup
       end
 
-      def add(content)
-        raise ArgumentError unless content.instance_of?(Content)
+      def push(content, *contents)
+        raise ArgumentError unless valid_content?(content)
         @contents.push(content) if @contents.all? { |c| c.url != content.url}
       end
 
@@ -83,14 +89,10 @@ module Dlsite
         self.class.new(contents: contents)
       end
 
-      def each(&block)
-        @contents.each { |c| yield c }
-      end
-
       def merge(others)
         return self unless others
         c = self.dup
-        others.each { |o| c.add(o) }
+        others.each { |o| c.push(o) }
         c
       end
 
@@ -112,6 +114,11 @@ module Dlsite
         end
 
         new(contents: contents)
+      end
+
+      private
+      def valid_content?(content)
+        content.instance_of?(Content)
       end
     end
 

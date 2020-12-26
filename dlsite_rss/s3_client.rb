@@ -27,14 +27,26 @@ module DlsiteRss
     def s3_client
       @s3_client ||=
         Aws::S3::Client.new(
-          region: ENV['REGION'],
-          access_key_id: ENV['ACCESS_KEY'],
-          secret_access_key: ENV['SECRET_ACCESS_KEY']
+          region: region,
+          access_key_id: access_key_id,
+          secret_access_key: secret_access_key
         )
     end
 
     def bucket
       ENV['BUCKET']
+    end
+
+    def region
+      ENV['REGION']
+    end
+
+    def access_key_id
+      ENV['ACCESS_KEY']
+    end
+
+    def secret_access_key
+      ENV['SECRET_ACCESS_KEY']
     end
   end
 end
