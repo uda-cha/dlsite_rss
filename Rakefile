@@ -1,12 +1,8 @@
 require_relative 'dlsite_rss/s3_client'
 require_relative 'dlsite_rss/voice'
 
-def debug_mode?
-  mode = ENV.fetch("DEBUG_MODE") { true }
-  mode == "false" ? false : true
-end
-
-def main
+desc 'run app'
+task :run do
   s3_client = DlsiteRss::S3Client.new
   voice_json = "voice.json".freeze
 
@@ -19,12 +15,10 @@ def main
   contents = latest_contents.merge(previous_contents).last(30)
   rss = Dlsite::Voice::Rss.make(contents)
 
-  if debug_mode?
-    puts rss.to_s
-  else
+  if ENV['PRODUCTION']
     s3_client.put(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
     s3_client.put(key: voice_json, body: contents.to_json)
+  else
+    puts rss.to_s
   end
 end
-
-main if __FILE__ == $0

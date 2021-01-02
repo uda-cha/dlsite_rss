@@ -30,6 +30,7 @@ GEM
     pry-byebug (3.9.0)
       byebug (~> 11.0)
       pry (~> 0.13.0)
+    rake (13.0.3)
 
 PLATFORMS
   ruby
@@ -38,6 +39,7 @@ DEPENDENCIES
   aws-sdk-s3
   nokogiri
   pry-byebug
+  rake
 
 BUNDLED WITH
    1.17.2

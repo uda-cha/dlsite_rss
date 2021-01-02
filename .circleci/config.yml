@@ -41,8 +41,8 @@ jobs:
       - checkout
       - restore_gems
       - run:
-          name: run app.rb in debug mode # TODO: write spec
-          command: bundle exec ruby app.rb
+          name: run in debug mode # TODO: write spec
+          command: bundle exec rake run
 
   execute:
     executor: default
@@ -51,7 +51,7 @@ jobs:
       - restore_gems
       - run:
           name: cron job
-          command: DEBUG_MODE=false bundle exec ruby app.rb
+          command: PRODUCTION=1 bundle exec rake run
 
 workflows:
   ci:
