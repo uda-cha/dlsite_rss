@@ -2,10 +2,7 @@ require_relative 'lib/dlsite/voice'
 
 desc 'run app'
 task :run do
-  latest_contents   = Dlsite::Voice::Parser.parse
-  previous_contents = Dlsite::Voice::Contents.previous_contents
-
-  contents = latest_contents.merge(previous_contents).last(30)
+  contents = Dlsite::Voice.make_current_contents
   rss = Dlsite::Voice::Rss.make(contents)
 
   if ENV['PRODUCTION']
