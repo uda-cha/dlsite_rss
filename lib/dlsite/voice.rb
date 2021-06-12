@@ -74,7 +74,6 @@ module Dlsite
 
       class << self
         def load_json(json)
-          return new unless json
           contents = JSON.parse(json).map do |c|
             Content.new(
               url: c['url'],
@@ -91,6 +90,7 @@ module Dlsite
 
         def previous_contents
           json = DlsiteRss::S3Client.get(key: JSON_FILENAME)
+          return new unless json
           load_json(json)
         end
       end
