@@ -1,5 +1,5 @@
-require_relative 'dlsite_rss/s3_client'
-require_relative 'dlsite_rss/voice'
+require_relative 'lib/dlsite_rss/s3_client'
+require_relative 'lib/dlsite/voice'
 
 desc 'run app'
 task :run do
