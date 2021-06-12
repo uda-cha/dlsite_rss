@@ -70,6 +70,8 @@ module Dlsite
       extend Forwardable
       def_delegators :@contents, :each
 
+      JSON_FILENAME = "voice.json".freeze
+
       class << self
         def load_json(json)
           return new unless json
@@ -85,6 +87,11 @@ module Dlsite
           end
 
           new(contents: contents)
+        end
+
+        def previous_contents
+          json = DlsiteRss::S3Client.get(key: JSON_FILENAME)
+          load_json(json)
         end
       end
 
@@ -119,9 +126,8 @@ module Dlsite
       end
 
       def save!
-        @s3_client ||= DlsiteRss::S3Client.new
-        @s3_client.put(
-          key: "voice.json",
+        DlsiteRss::S3Client.put(
+          key: JSON_FILENAME,
           body: self.to_json
         )
       end

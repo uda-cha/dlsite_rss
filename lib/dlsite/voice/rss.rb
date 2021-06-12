@@ -34,8 +34,7 @@ module Dlsite
       end
 
       def save!
-        @s3_client ||= DlsiteRss::S3Client.new
-        @s3_client.put(
+        DlsiteRss::S3Client.put(
           key: "voice_rss.xml",
           body: self.to_s,
            content_type: "application/xml",
