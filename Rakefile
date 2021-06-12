@@ -1,5 +1,4 @@
 require_relative 'lib/dlsite/voice'
-require_relative 'lib/dlsite/voice/rss'
 
 desc 'run app'
 task :run do
