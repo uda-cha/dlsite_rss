@@ -18,7 +18,7 @@ task :run do
 
   if ENV['PRODUCTION']
     rss.save!
-    s3_client.put(key: voice_json, body: contents.to_json)
+    contents.save!
   else
     puts rss.to_s
   end

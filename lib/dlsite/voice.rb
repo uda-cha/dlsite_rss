@@ -1,8 +1,8 @@
 require 'json'
 require 'nokogiri'
 require 'open-uri'
-require 'rss'
 require 'zlib'
+require_relative '../dlsite_rss/s3_client'
 
 module Dlsite
   module Voice
@@ -70,6 +70,24 @@ module Dlsite
       extend Forwardable
       def_delegators :@contents, :each
 
+      class << self
+        def load_json(json)
+          return new unless json
+          contents = JSON.parse(json).map do |c|
+            Content.new(
+              url: c['url'],
+              title: c['title'],
+              maker: c['maker'],
+              author: c['author'],
+              work_text: c['work_text'],
+              updated_at: Time.parse(c['updated_at']),
+            )
+          end
+
+          new(contents: contents)
+        end
+      end
+
       def initialize(contents: nil)
         raise ArgumentError if contents && !contents.all? { |c| valid_content?(c) }
         @contents = contents || []
@@ -100,20 +118,12 @@ module Dlsite
         @contents.map(&:to_h).to_json
       end
 
-      def self.load_json(json)
-        return new unless json
-        contents = JSON.parse(json).map do |c|
-          Content.new(
-            url: c['url'],
-            title: c['title'],
-            maker: c['maker'],
-            author: c['author'],
-            work_text: c['work_text'],
-            updated_at: Time.parse(c['updated_at']),
-          )
-        end
-
-        new(contents: contents)
+      def save!
+        @s3_client ||= DlsiteRss::S3Client.new
+        @s3_client.put(
+          key: "voice.json",
+          body: self.to_json
+        )
       end
 
       private
