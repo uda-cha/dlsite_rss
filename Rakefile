@@ -1,5 +1,6 @@
 require_relative 'lib/dlsite_rss/s3_client'
 require_relative 'lib/dlsite/voice'
+require_relative 'lib/dlsite/voice/rss'
 
 desc 'run app'
 task :run do
@@ -16,7 +17,7 @@ task :run do
   rss = Dlsite::Voice::Rss.make(contents)
 
   if ENV['PRODUCTION']
-    s3_client.put(key: "voice_rss.xml", body: rss.to_s, content_type: "application/xml", public: true)
+    rss.save!
     s3_client.put(key: voice_json, body: contents.to_json)
   else
     puts rss.to_s

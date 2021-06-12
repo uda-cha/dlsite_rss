@@ -127,27 +127,5 @@ module Dlsite
         "[#{maker}#{" / " + author if author}] #{work_text}"
       end
     end
-
-    module Rss
-      def self.make(contents)
-        RSS::Maker.make('2.0') do |maker|
-          maker.channel.language = 'ja'
-          maker.channel.author = "uda-cha"
-          maker.channel.updated = Time.now
-          maker.channel.link = ENV['RSS_URL']
-          maker.channel.title = "DLsite RSS Feed(Voice)"
-          maker.channel.description = "DLsite RSS Feed(Voice)"
-
-          contents.each do |c|
-            maker.items.new_item do |item|
-              item.link = c.url
-              item.title = c.title
-              item.description = c.description
-              item.updated = c.updated_at
-            end
-          end
-        end
-      end
-    end
   end
 end
