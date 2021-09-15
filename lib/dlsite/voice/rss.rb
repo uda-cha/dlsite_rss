@@ -22,6 +22,9 @@ module Dlsite
               item.title = c.title
               item.description = c.description
               item.updated = c.updated_at
+              item.enclosure.url = c.enclosure_url
+              item.enclosure.type = c.enclosure_type
+              item.enclosure.length = c.enclosure_length
             end
           end
         end

@@ -20,6 +20,9 @@ module Dlsite
               author: c['author'],
               work_text: c['work_text'],
               updated_at: Time.parse(c['updated_at']),
+              enclosure_url: c['enclosure_url'],
+              enclosure_type:  c['enclosure_type'],
+              enclosure_length: c['enclosure_length']
             )
           end
 
@@ -75,7 +78,12 @@ module Dlsite
       end
     end
 
-    class Content < Struct.new(:url, :title, :maker, :author, :work_text, :updated_at, keyword_init: true)
+    class Content < Struct.new(
+        :url, :title, :maker, :author, :work_text, :updated_at,
+        :enclosure_url, :enclosure_type, :enclosure_length,
+        keyword_init: true
+      )
+
       def description
         "[#{maker}#{" / " + author if author}] #{work_text}"
       end
