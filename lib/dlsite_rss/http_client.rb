@@ -1,12 +1,18 @@
-require 'net/http'
+require 'httparty'
 require 'nokogiri'
 
 module DlsiteRss
   class HttpClient
     class << self
       def get(url)
-        uri = URI.parse(url)
-        Net::HTTP.get_response(uri)
+        HTTParty.get(url)
+      rescue => e
+        puts "url: " + url.to_s
+        raise e
+      end
+
+      def head(url)
+        HTTParty.head(url)
       rescue => e
         puts "url: " + url.to_s
         raise e

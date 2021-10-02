@@ -5,6 +5,8 @@ require_relative '../../dlsite_rss/http_client'
 module Dlsite
   module Voice
     class Parser
+      class Enclosure < Struct.new(:url, :type, :length, keyword_init: true); end
+
       URL = 'https://www.dlsite.com/maniax/new/=/work_type_category/voice'.freeze
 
       def self.parse
@@ -41,8 +43,6 @@ module Dlsite
         contents
       end
 
-      class Enclosure < Struct.new(:url, :type, :length, keyword_init: true); end
-
       private
       def parse_updated_at(url)
         doc = DlsiteRss::HttpClient.parse_with_nokogiri(url)
@@ -51,12 +51,9 @@ module Dlsite
       end
 
       def parse_enclosure(url)
-        if url
-          response = DlsiteRss::HttpClient.get(url)
-          Enclosure.new(url: url, type: response.content_type, length: response.content_length)
-        else
-          Enclosure.new(url: nil, type: nil, length: nil)
-        end
+        return Enclosure.new unless url
+        response = DlsiteRss::HttpClient.head(url)
+        Enclosure.new(url: url, type: response.content_type, length: response.content_length)
       end
     end
   end
