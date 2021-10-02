@@ -5,3 +5,7 @@
 vendor/*
 !vendor/.gitkeep
 samconfig.toml
+
+.next/
+out/
+node_modules/
