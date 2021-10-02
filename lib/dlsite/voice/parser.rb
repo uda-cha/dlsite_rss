@@ -1,8 +1,6 @@
-require 'net/http'
-require 'nokogiri'
 require 'time'
-require 'zlib'
 require_relative 'contents'
+require_relative '../../dlsite_rss/http_client'
 
 module Dlsite
   module Voice
@@ -14,8 +12,7 @@ module Dlsite
       end
 
       def parse
-        response = get_request(URL)
-        doc = Nokogiri::HTML.parse(response.body, nil, response.type_params["charset"]).search('.n_worklist_item')
+        doc = DlsiteRss::HttpClient.parse_with_nokogiri(URL).search('.n_worklist_item')
 
         contents = Dlsite::Voice::Contents.new
         doc.each do |work|
@@ -47,24 +44,15 @@ module Dlsite
       class Enclosure < Struct.new(:url, :type, :length, keyword_init: true); end
 
       private
-      def get_request(url)
-        uri = URI.parse(url)
-        Net::HTTP.get_response(uri)
-      rescue => e
-        puts "url: " + url.to_s
-        raise e
-      end
-
       def parse_updated_at(url)
-        response = get_request(url)
-        doc = Nokogiri::HTML.parse(response.body, nil, response.type_params["charset"])
+        doc = DlsiteRss::HttpClient.parse_with_nokogiri(url)
         updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1]").inner_text + '+09:00'
         Time.strptime(updated_at_txt, '%Y年%m月%d日%t%H時%z')
       end
 
       def parse_enclosure(url)
         if url
-          response = get_request(url)
+          response = DlsiteRss::HttpClient.get(url)
           Enclosure.new(url: url, type: response.content_type, length: response.content_length)
         else
           Enclosure.new(url: nil, type: nil, length: nil)
