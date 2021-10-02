@@ -14,20 +14,23 @@ module Dlsite
       end
 
       def parse
-        doc = DlsiteRss::HttpClient.parse_with_nokogiri(URL).search('.n_worklist_item')
+        work_list = DlsiteRss::HttpClient.parse_with_nokogiri(URL).search('.n_worklist_item')
 
         contents = Dlsite::Voice::Contents.new
-        doc.each do |work|
-          node = work.search('.work_name')
-          url = node.at_css('a').attribute('href').value
+        work_list.each do |work|
+          a_tag = work.search('.work_name').at_css('a')
+          url = a_tag.attribute('href').value
 
-          enclosure_url = work.search('.work_thumb_inner').at_css('img').attr('src')&.gsub(/^\/\//, "https://")
+          img_tag = work.search('.work_thumb_inner').at_css('img')
+          enclosure_url = (
+            img_tag.attr('src') || img_tag.attr('data-src')
+          )&.gsub(/^\/\//, "https://")
           enclosure = parse_enclosure(enclosure_url)
 
           contents.push(
             Dlsite::Voice::Content.new(
               url: url,
-              title: node.at_css('a').inner_text,
+              title: a_tag.inner_text,
               maker: work.search('.maker_name').at_css('a').inner_text,
               author: work.search('.author').at_css('a')&.inner_text,
               work_text: work.search('.work_text').inner_text,
