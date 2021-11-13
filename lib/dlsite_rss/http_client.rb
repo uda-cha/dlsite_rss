@@ -3,19 +3,19 @@ require 'nokogiri'
 
 module DlsiteRss
   class HttpClient
+    class HttpError < StandardError; end
+
     class << self
       def get(url)
-        HTTParty.get(url, headers: headers)
-      rescue => e
-        puts "url: " + url.to_s
-        raise e
+        HTTParty.get(url, headers: headers).tap do |res|
+          raise HttpError.new("HTTP #{res.code}, #{url}") if res.code >= 400
+        end
       end
 
       def head(url)
-        HTTParty.head(url, headers: headers)
-      rescue => e
-        puts "url: " + url.to_s
-        raise e
+        HTTParty.head(url, headers: headers).tap do |res|
+          raise HttpError.new("HTTP #{res.code}, #{url}") if res.code >= 400
+        end
       end
 
       def parse_with_nokogiri(url)
