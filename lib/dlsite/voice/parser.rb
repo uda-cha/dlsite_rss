@@ -17,6 +17,9 @@ module Dlsite
         work_list = DlsiteRss::HttpClient.parse_with_nokogiri(URL).search('.n_worklist_item')
 
         contents = Dlsite::Voice::Contents.new
+
+        sleep(0.3)
+
         work_list.each do |work|
           a_tag = work.search('.work_name').at_css('a')
           url = a_tag.attribute('href').value
@@ -26,6 +29,8 @@ module Dlsite
             img_tag.attr('src') || img_tag.attr('data-src')
           )&.gsub(/^\/\//, "https://")
           enclosure = parse_enclosure(enclosure_url)
+
+          sleep(1)
 
           contents.push(
             Dlsite::Voice::Content.new(
@@ -40,7 +45,7 @@ module Dlsite
               enclosure_length: enclosure.length,
             )
           )
-          sleep(0.3)
+          sleep(1)
         end
 
         contents
