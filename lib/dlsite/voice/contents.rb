@@ -36,7 +36,7 @@ module Dlsite
       end
 
       def initialize(contents: nil)
-        raise ArgumentError if contents && !contents.all? { |c| valid_content?(c) }
+        raise ArgumentError if contents && contents.any? { |c| !valid_content?(c) }
         @contents = contents || []
       end
 
@@ -44,9 +44,11 @@ module Dlsite
         @contents = @contents.dup
       end
 
-      def push(content, *contents)
-        raise ArgumentError unless valid_content?(content)
-        @contents.push(content) if @contents.all? { |c| c.url != content.url}
+      def push(*contents)
+        contents.each do |content|
+          raise ArgumentError unless valid_content?(content)
+          @contents.push(content) if @contents.all? { |c| c.url != content.url}
+        end
       end
 
       def last(n)
