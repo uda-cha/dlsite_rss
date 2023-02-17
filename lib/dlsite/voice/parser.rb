@@ -54,8 +54,15 @@ module Dlsite
       private
       def parse_updated_at(url)
         doc = DlsiteRss::HttpClient.parse_with_nokogiri(url)
-        updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1]").inner_text + '+09:00'
-        Time.strptime(updated_at_txt, '%Y年%m月%d日%t%H時%z')
+        updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1]").inner_text
+
+        if updated_at_txt.include?('時')
+          format = '%Y年%m月%d日%t%H時'
+        else
+          format = '%Y年%m月%d日'
+        end
+
+        Time.strptime(updated_at_txt + '+09:00', format + '%z')
       end
 
       def parse_enclosure(url)
