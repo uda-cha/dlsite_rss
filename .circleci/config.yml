@@ -3,7 +3,7 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: circleci/ruby:2.6.2-stretch
+      - image: cimg/ruby:2.6.2
         environment:
           BUNDLE_PATH: .bundle
           BUNDLE_JOBS: 4
@@ -14,14 +14,14 @@ commands:
       - save_cache:
           paths:
             - .bundle
-          key: gems-202007300040-{{ checksum "Gemfile.lock" }}
+          key: gems-202302171040-{{ checksum "Gemfile.lock" }}
 
   restore_gems:
     steps:
       - restore_cache:
           keys:
-            - gems-202007300040-{{ checksum "Gemfile.lock" }}
-            - gems-202007300040-
+            - gems-202302171040-{{ checksum "Gemfile.lock" }}
+            - gems-202302171040-
             - gems-
 
 jobs:
@@ -61,13 +61,10 @@ workflows:
           requires:
             - prepare
   execute:
-    triggers:
-      - schedule:
-          cron: "10 3,9,15,21 * * *"
-          filters:
-            branches:
-              only:
-                - master
+    when:
+      equal:
+        - master
+        - << pipeline.git.branch >>
     jobs:
       - prepare
       - execute:
