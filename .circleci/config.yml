@@ -61,13 +61,10 @@ workflows:
           requires:
             - prepare
   execute:
-    triggers:
-      - schedule:
-          cron: "10 3,9,15,21 * * *"
-          filters:
-            branches:
-              only:
-                - master
+    when:
+      equal:
+        - master
+        - << pipeline.git.branch >>
     jobs:
       - prepare
       - execute:
