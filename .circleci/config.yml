@@ -14,14 +14,14 @@ commands:
       - save_cache:
           paths:
             - .bundle
-          key: gems-202007300040-{{ checksum "Gemfile.lock" }}
+          key: gems-202302171040-{{ checksum "Gemfile.lock" }}
 
   restore_gems:
     steps:
       - restore_cache:
           keys:
-            - gems-202007300040-{{ checksum "Gemfile.lock" }}
-            - gems-202007300040-
+            - gems-202302171040-{{ checksum "Gemfile.lock" }}
+            - gems-202302171040-
             - gems-
 
 jobs:
