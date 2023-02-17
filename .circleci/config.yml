@@ -50,11 +50,16 @@ jobs:
       - checkout
       - restore_gems
       - run:
-          name: cron job
+          name: deploy RSS
           command: PRODUCTION=1 bundle exec rake run
 
 workflows:
   ci:
+    when:
+      not:
+        equal:
+          - master
+          - << pipeline.git.branch >>
     jobs:
       - prepare
       - test:
