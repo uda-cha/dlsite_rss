@@ -3,7 +3,7 @@ version: 2.1
 executors:
   default:
     docker:
-      - image: circleci/ruby:2.6.2-stretch
+      - image: cimg/ruby:2.6.2
         environment:
           BUNDLE_PATH: .bundle
           BUNDLE_JOBS: 4
