@@ -4,6 +4,7 @@ require 'nokogiri'
 module DlsiteRss
   class HttpClient
     class HttpError < StandardError; end
+    class HttpNotFoundError < StandardError; end
 
     NUM_OF_RETRIES = 3
 
@@ -36,6 +37,7 @@ module DlsiteRss
 
       def raise_on_http_error(&block)
         res = yield
+        raise HttpNotFoundError.new("HTTP #{res.code}, #{res.request.last_uri}") if res.code == 404
         raise HttpError.new("HTTP #{res.code}, #{res.request.last_uri}") if res.code >= 400
         res
       end
@@ -45,6 +47,9 @@ module DlsiteRss
         begin
           try += 1
           yield
+        rescue HttpNotFoundError => e
+          puts e.message
+          puts "skip..."
         rescue => e
           puts e.message
           puts "retrying after 3 seconds..."
