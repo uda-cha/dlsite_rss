@@ -86,8 +86,10 @@ module Dlsite
         keyword_init: true
       )
 
+      # The reason for checking that the author is not falthy here is for backward compatibility
+      # Now author is a String
       def description
-        "[#{maker}#{" / " + author if author}] #{work_text}"
+        "[#{maker}#{" / " + author if author && !author.empty?}] #{work_text}"
       end
     end
   end

@@ -28,12 +28,14 @@ module Dlsite
           )&.gsub(/^\/\//, "https://")
           enclosure = parse_enclosure(enclosure_url)
 
+          author = work.search('.author').css('a').map(&:inner_text).join(", ")
+
           contents.push(
             Dlsite::Voice::Content.new(
               url: url,
               title: work_name_a_tag.inner_text,
               maker: work.search('.maker_name').at_css('a').inner_text,
-              author: work.search('.author').at_css('a')&.inner_text,
+              author: author,
               work_text: work.search('.work_text').inner_text,
               updated_at: parse_updated_at(url),
               enclosure_url: enclosure.url,
