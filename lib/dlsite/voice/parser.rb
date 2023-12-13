@@ -18,26 +18,24 @@ module Dlsite
 
         contents = Dlsite::Voice::Contents.new
 
-        sleep(0.3)
-
         work_list.each do |work|
-          a_tag = work.search('.work_name').at_css('a')
-          url = a_tag.attribute('href').value
+          work_name_a_tag = work.search('.work_name').at_css('a')
+          url = work_name_a_tag.attribute('href').value
 
-          img_tag = work.search('.work_thumb_inner').at_css('img')
+          _img_tag = work.search('.work_thumb_inner').at_css('img')
           enclosure_url = (
-            img_tag.attr('src') || img_tag.attr('data-src')
+            _img_tag.attr('src') || _img_tag.attr('data-src')
           )&.gsub(/^\/\//, "https://")
           enclosure = parse_enclosure(enclosure_url)
 
-          sleep(1)
+          author = work.search('.author').css('a').map(&:inner_text).join(", ")
 
           contents.push(
             Dlsite::Voice::Content.new(
               url: url,
-              title: a_tag.inner_text,
+              title: work_name_a_tag.inner_text,
               maker: work.search('.maker_name').at_css('a').inner_text,
-              author: work.search('.author').at_css('a')&.inner_text,
+              author: author,
               work_text: work.search('.work_text').inner_text,
               updated_at: parse_updated_at(url),
               enclosure_url: enclosure.url,
@@ -45,7 +43,6 @@ module Dlsite
               enclosure_length: enclosure.length,
             )
           )
-          sleep(1)
         end
 
         contents
