@@ -10,6 +10,8 @@ module DlsiteRss
 
     class << self
       def get(url)
+        sleep(1)
+
         retry_on_error do
           raise_on_http_error do
             HTTParty.get(url, headers: headers)
@@ -18,6 +20,8 @@ module DlsiteRss
       end
 
       def head(url)
+        sleep(1)
+
         retry_on_error do
           raise_on_http_error do
             HTTParty.head(url, headers: headers)
