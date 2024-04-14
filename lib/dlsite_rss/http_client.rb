@@ -31,6 +31,7 @@ module DlsiteRss
 
       def parse_with_nokogiri(url)
         res = get(url)
+        return nil unless res
         Nokogiri::HTML.parse(res.body, nil, res.type_params["charset"])
       end
 
