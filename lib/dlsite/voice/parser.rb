@@ -51,6 +51,7 @@ module Dlsite
       private
       def parse_updated_at(url)
         doc = DlsiteRss::HttpClient.parse_with_nokogiri(url)
+        return Time.now unless doc
         updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1]").inner_text
 
         if updated_at_txt.include?('時')
