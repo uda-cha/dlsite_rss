@@ -1,57 +1,40 @@
 version: 2.1
 
+orbs:
+  ruby: circleci/ruby@2.6.0
+
 executors:
   default:
     docker:
-      - image: cimg/ruby:2.6.2
+      - image: cimg/ruby:3.3.0
         environment:
           BUNDLE_PATH: .bundle
           BUNDLE_JOBS: 4
-
-commands:
-  save_gems:
-    steps:
-      - save_cache:
-          paths:
-            - .bundle
-          key: gems-202302171040-{{ checksum "Gemfile.lock" }}
-
-  restore_gems:
-    steps:
-      - restore_cache:
-          keys:
-            - gems-202302171040-{{ checksum "Gemfile.lock" }}
-            - gems-202302171040-
-            - gems-
 
 jobs:
   prepare:
     executor: default
     steps:
       - checkout
-      - restore_gems
-      - run:
-          name: bundle install
-          command: bundle install
-      - save_gems
+      - ruby/install-deps
 
   test:
     executor: default
     steps:
       - checkout
-      - restore_gems
+      - ruby/install-deps
       - run:
-          name: run in debug mode # TODO: write spec
+          name: run in debug mode
           command: bundle exec rake run
 
   execute:
     executor: default
     steps:
       - checkout
-      - restore_gems
+      - ruby/install-deps
       - run:
           name: deploy RSS
-          command: PRODUCTION=1 bundle exec rake run
+          command: bundle exec rake run[voice,production]
 
 workflows:
   ci:

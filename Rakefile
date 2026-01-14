@@ -1,14 +1,8 @@
-require_relative 'lib/dlsite/voice'
+require_relative 'lib/dlsite_rss'
 
-desc 'run app'
-task :run do
-  contents = Dlsite::Voice.make_current_contents
-  rss = Dlsite::Voice::Rss.make(contents)
-
-  if ENV['PRODUCTION']
-    rss.save!
-    contents.save!
-  else
-    puts rss.to_s
-  end
+desc 'run voice scraping and generate RSS'
+task :run, [:category, :env] do |t, args|
+  category = args[:category] || 'voice'
+  env = args[:env] || 'development'
+  DlsiteRss.run(category, env)
 end
