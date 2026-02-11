@@ -65,6 +65,10 @@ module DlsiteRss
       return Enclosure.new unless url
       response = DlsiteRss::HttpClient.head(url)
       Enclosure.new(url: url, type: response.content_type, length: response.content_length)
+    rescue DlsiteRss::HttpClient::HttpAccessDeniedError
+      # dlsiteのcdn画像は実行環境によって403が返ることがあるため、
+      # その場合は最低限の情報だけ持つEnclosureを返す
+      Enclosure.new(url: url)
     end
   end
 end
