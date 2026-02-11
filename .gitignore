@@ -1,7 +1,9 @@
 .aws-sam/*
 .env
 .bundle/*
+.claude/*
 !.bundle/config
+.tool-versions
 vendor/*
 !vendor/.gitkeep
 samconfig.toml
