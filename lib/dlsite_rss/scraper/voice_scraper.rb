@@ -64,6 +64,7 @@ module DlsiteRss
     def parse_enclosure(url)
       return Enclosure.new unless url
       response = DlsiteRss::HttpClient.head(url)
+      return Enclosure.new(url: url) unless response
       Enclosure.new(url: url, type: response.content_type, length: response.content_length)
     rescue DlsiteRss::HttpClient::HttpAccessDeniedError
       # dlsiteのcdn画像は実行環境によって403が返ることがあるため、
