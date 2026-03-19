@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.8.9)
+      public_suffix (>= 2.0.2, < 8.0)
     aws-eventstream (1.4.0)
     aws-partitions (1.1203.0)
     aws-sdk-core (3.241.3)
@@ -24,7 +26,12 @@ GEM
     bigdecimal (4.0.1)
     byebug (12.0.0)
     coderay (1.1.3)
+    crack (1.0.1)
+      bigdecimal
+      rexml
     csv (3.3.5)
+    diff-lcs (1.6.2)
+    hashdiff (1.2.1)
     httparty (0.24.0)
       csv
       mini_mime (>= 1.0.0)
@@ -33,8 +40,12 @@ GEM
     logger (1.7.0)
     method_source (1.1.0)
     mini_mime (1.1.5)
+    mini_portile2 (2.8.9)
     multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
+    nokogiri (1.19.0)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.19.0-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.0-aarch64-linux-musl)
@@ -57,11 +68,30 @@ GEM
     pry-byebug (3.11.0)
       byebug (~> 12.0)
       pry (>= 0.13, < 0.16)
+    public_suffix (7.0.5)
     racc (1.8.1)
     rake (13.3.1)
     rexml (3.4.4)
+    rspec (3.13.2)
+      rspec-core (~> 3.13.0)
+      rspec-expectations (~> 3.13.0)
+      rspec-mocks (~> 3.13.0)
+    rspec-core (3.13.6)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.8)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-support (3.13.7)
     rss (0.3.2)
       rexml
+    vcr (6.4.0)
+    webmock (3.26.2)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
   aarch64-linux-gnu
@@ -69,6 +99,7 @@ PLATFORMS
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux-gnu
   x86_64-linux-musl
@@ -79,7 +110,10 @@ DEPENDENCIES
   nokogiri
   pry-byebug
   rake
+  rspec
   rss (~> 0.3.2)
+  vcr
+  webmock
 
 BUNDLED WITH
    2.5.3

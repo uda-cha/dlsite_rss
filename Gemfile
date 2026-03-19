@@ -12,4 +12,7 @@ gem "rss", "~> 0.3.2"
 
 group :development, :test do
   gem "pry-byebug"
+  gem "rspec"
+  gem "vcr"
+  gem "webmock"
 end
