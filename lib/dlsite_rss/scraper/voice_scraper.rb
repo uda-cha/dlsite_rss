@@ -30,9 +30,13 @@ module DlsiteRss
       url = work_name_a_tag.attribute('href').value
 
       _img_tag = work.search('.work_thumb_inner').at_css('img')
-      enclosure_url = (
+      _v_src = _img_tag.attr(':src')
+      # ex. :src="is_show ? '//img.dlsite.jp/modpub/images2/work/doujin/RJXXXXXXXX/RJXXXXXXXX_img_main.jpg' : 'data:image/gif;base64,...'"
+      enclosure_url = if _v_src
+        _v_src.match(/'(\/\/[^']+)'/)&.captures&.first
+      else
         _img_tag.attr('src') || _img_tag.attr('data-src')
-      )&.gsub(/^\/\//, "https://")
+      end&.gsub(/^\/\//, "https://")
       enclosure = parse_enclosure(enclosure_url)
 
       author = work.search('.author').css('a').map(&:inner_text).join(", ")
