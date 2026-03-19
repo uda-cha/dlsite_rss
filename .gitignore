@@ -6,7 +6,10 @@
 .tool-versions
 vendor/*
 !vendor/.gitkeep
+spec/fixtures/vcr_cassettes/*
+!spec/fixtures/vcr_cassettes/**/.gitkeep
 samconfig.toml
+tmp/
 
 .next/
 out/
