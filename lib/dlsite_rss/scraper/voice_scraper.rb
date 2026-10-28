@@ -29,13 +29,14 @@ module DlsiteRss
       work_name_a_tag = work.search('.work_name').at_css('a')
       url = work_name_a_tag.attribute('href').value
 
+      # 画像未登録の作品はポップアップ用のimgタグが存在しない
       _img_tag = work.search('.work_thumb_inner').at_css('img')
-      _v_src = _img_tag.attr(':src')
+      _v_src = _img_tag&.attr(':src')
       # ex. :src="is_show ? '//img.dlsite.jp/modpub/images2/work/doujin/RJXXXXXXXX/RJXXXXXXXX_img_main.jpg' : 'data:image/gif;base64,...'"
       enclosure_url = if _v_src
         _v_src.match(/'(\/\/[^']+)'/)&.captures&.first
       else
-        _img_tag.attr('src') || _img_tag.attr('data-src')
+        _img_tag&.attr('src') || _img_tag&.attr('data-src')
       end&.gsub(/^\/\//, "https://")
       enclosure = parse_enclosure(enclosure_url)
 
