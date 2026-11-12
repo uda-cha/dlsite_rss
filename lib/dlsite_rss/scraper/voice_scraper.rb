@@ -59,8 +59,10 @@ module DlsiteRss
       doc = DlsiteRss::HttpClient.parse_with_nokogiri(url)
       return Time.now unless doc
 
-      updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1]")
-                           .inner_text
+      # 旧: <th>販売日</th><td>..</td> / 新: <dt>販売日</dt><dd>..</dd>
+      updated_at_txt = doc.xpath("//th[contains(text(), '販売日')]/following-sibling::td[1] | " \
+                                 "//dt[contains(text(), '販売日')]/following-sibling::dd[1]")
+                           .inner_text.strip
 
       format = updated_at_txt.include?('時') ? '%Y年%m月%d日%t%H時' : '%Y年%m月%d日'
       Time.strptime(updated_at_txt + '+09:00', format + '%z')
