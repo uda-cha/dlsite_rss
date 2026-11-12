@@ -47,7 +47,7 @@ DLsite の DOM 構造が変わってテストが落ちた場合、カセット�
 
 ```sh
 # 全カセット削除
-$ rm spec/fixtures/vcr_cassettes/**/*.yml
+$ find spec/fixtures/vcr_cassettes -name '*.yml' -delete
 $ bundle exec rspec
 ```
 
